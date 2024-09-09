@@ -20,13 +20,22 @@ const UploadImages = () => {
     });
     formData.append('context', context);
 
-    const response = await fetch('http://127.0.0.1:5000/api/describe', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/describe', {
+        method: 'POST',
+        body: formData,
+      });
 
-    const result = await response.json();
-    navigate('/result', { state: { instructions: JSON.stringify(result.instructions, null, 2) } });
+      if (!response.ok) {
+        throw new Error('Failed to fetch instructions');
+      }
+
+      const result = await response.json();
+      navigate('/result', { state: { instructions: JSON.stringify(result.instructions, null, 2) } });
+    } catch (error) {
+      console.error('Error generating instructions:', error);
+      alert('Failed to generate instructions. Please try again.');
+    }
   };
 
   return (
