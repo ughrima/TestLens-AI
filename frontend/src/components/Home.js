@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './Home.css';  
 
 const Home = () => {
   return (
-    <div>
-      <h1>Welcome to the Testing Instruction Generator</h1>
+    <div className="home-container">
+      <h1>Transform Your Testing Experience with Our Smart Generator</h1>
       <Link to="/upload-images">
-        <button>Start Generating Testing Instructions</button>
+        <button className="start-button">Start Generating Testing Instructions</button>
       </Link>
     </div>
   );
