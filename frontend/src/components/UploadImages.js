@@ -14,8 +14,8 @@ const UploadImages = () => {
     e.preventDefault();
     const formData = new FormData();
 
-    // Append images and context
     images.forEach((image) => {
+      console.log("Appending file:", image); // Log file details for debugging
       formData.append('images', image);
     });
     formData.append('context', context);
@@ -27,14 +27,14 @@ const UploadImages = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch instructions');
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const result = await response.json();
       navigate('/result', { state: { instructions: JSON.stringify(result.instructions, null, 2) } });
     } catch (error) {
       console.error('Error generating instructions:', error);
-      alert('Failed to generate instructions. Please try again.');
+      alert('Error generating instructions. Please try again.');
     }
   };
 

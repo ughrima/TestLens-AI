@@ -8,8 +8,7 @@ from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  
-
+CORS(app)  # Enable CORS
 # Set a folder to save uploaded images temporarily
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -57,11 +56,10 @@ def describe():
     if 'images' not in request.files:
         return jsonify({'error': 'No images uploaded'}), 400
 
-    # Get images and context from the request
     images = request.files.getlist('images')
-    context = request.form.get('context', '')
+    if not images:
+        return jsonify({'error': 'No images uploaded'}), 400
 
-    # Save images to upload folder
     image_paths = []
     for image in images:
         filename = secure_filename(image.filename)
@@ -69,20 +67,22 @@ def describe():
         image.save(image_path)
         image_paths.append(image_path)
 
-    # Generate image features using CLIP
-    image_features = generate_image_features(image_paths)
+    try:
+        # Generate image features using CLIP
+        image_features = generate_image_features(image_paths)
 
-    # Generate testing instructions using GPT-2
-    instructions = generate_test_instructions(context, image_features)
+        # Generate testing instructions using GPT-2
+        instructions = generate_test_instructions(context, image_features)
 
-    # Clean up uploaded files
-    for path in image_paths:
-        try:
+        return jsonify({'instructions': instructions})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        # Clean up uploaded files
+        for path in image_paths:
             os.remove(path)
-        except PermissionError as e:
-            print(f"Error removing file: {e}")  # Handle the error gracefully
-
-    return jsonify({'instructions': instructions})
 
 if __name__ == '__main__':
     # Run the Flask app
